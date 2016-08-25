@@ -5,6 +5,8 @@ import (
 	"io/ioutil"
 	"net/http"
 	"net/url"
+
+	log "github.com/Sirupsen/logrus"
 )
 
 type Webhose struct {
@@ -28,7 +30,7 @@ type Response struct {
 			ParticipantsCount int         `json:"participants_count,omitempty"`
 			SiteType          string      `json:"site_type,omitempty"`
 			Country           string      `json:"country"`
-			SpamScore         int         `json:"spam_score,omitempty"`
+			SpamScore         float32     `json:"spam_score,omitempty"`
 			MainImage         string      `json:"main_image"`
 			PerfScore         int         `json:"preformance_score,omitempty"`
 			Social            interface{} `json:"social,omitempty"`
@@ -46,9 +48,18 @@ type Response struct {
 		Language       string   `json:"language"`
 		ExternalLinks  []string `json:"external_links"`
 		Entities       struct {
-			Persons       interface{} `json:"persons, omitempty"`
-			Locations     interface{} `json:"locations, omitempty"`
-			Organizations interface{} `json:"organizations, omitempty"`
+			Persons []struct {
+				Name      string `json:"name, omitempty"`
+				Sentiment string `json:"sentiment, omitempty"`
+			} `json:"persons, omitempty"`
+			Locations []struct {
+				Name      string `json:"name, omitempty"`
+				Sentiment string `json:"sentiment, omitempty"`
+			} `json:"locations, omitempty"`
+			Organizations []struct {
+				Name      string `json:"name, omitempty"`
+				Sentiment string `json:"sentiment, omitempty"`
+			} `json:"organizations, omitempty"`
 		} `json:"entities, omitempty"`
 		Crawled string `json:"crawled"`
 	} `json:"posts"`
@@ -83,6 +94,7 @@ func Search(input string, wb Webhose) (*Response, error) {
 	if err != nil {
 		return nil, err
 	}
+	log.Debug(string(bytes))
 	var response Response
 	err = json.Unmarshal(bytes, &response)
 	if err != nil {
