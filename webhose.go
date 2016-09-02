@@ -36,6 +36,7 @@ type Response struct {
 			Social            interface{} `json:"social,omitempty"`
 			DomainRank        int         `json:"domain_rank,omitempty"`
 		} `json:"thread"`
+		Id             int      `json:"id"`
 		Uuid           string   `json:"uuid"`
 		Url            string   `json:"url"`
 		OrdInThread    int      `json:"ord_in_thread"`
@@ -68,7 +69,7 @@ type Response struct {
 const (
 	Language = "language"
 	SiteType = "site_type"
-	Site     = "site "
+	Site     = "site"
 )
 
 func Search(input string, wb Webhose) (*Response, error) {
@@ -100,5 +101,21 @@ func Search(input string, wb Webhose) (*Response, error) {
 	if err != nil {
 		return nil, err
 	}
+	for i := 1; i <= len(response.Posts); i++ {
+		response.Posts[i-1].Id = i
+	}
 	return &response, nil
+}
+
+func (r *Response) EmberID() {
+	var i int = 1
+	for _, post := range r.Posts {
+		post.Id = i
+		i++
+	}
+}
+
+func (r *Response) String() string {
+	bytes, _ := json.Marshal(r)
+	return string(bytes)
 }
