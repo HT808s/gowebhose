@@ -5,8 +5,6 @@ import (
 	"io/ioutil"
 	"net/http"
 	"net/url"
-
-	log "github.com/Sirupsen/logrus"
 )
 
 type Webhose struct {
@@ -95,7 +93,6 @@ func Search(input string, wb Webhose) (*Response, error) {
 	if err != nil {
 		return nil, err
 	}
-	log.Debug(string(bytes))
 	var response Response
 	err = json.Unmarshal(bytes, &response)
 	if err != nil {
